@@ -106,7 +106,7 @@ export default function Navbar() {
    
     try {
         const {data} = axios.post(`/api/user-auth/logout`)
-        
+
     } catch (error) {
         console.log(error)
     }
@@ -195,7 +195,7 @@ export default function Navbar() {
                 </button>
               ) : (
                 <Link
-                  href="/login"
+                  href="/auth"
                   className="block px-3 py-2 rounded-md bg-blue-600 hover:bg-blue-700 transition font-medium"
                   onClick={() => setIsOpen(false)}
                 >

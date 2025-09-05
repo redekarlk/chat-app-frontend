@@ -107,6 +107,7 @@
 
 
 "use client";
+import Navbar from '@/components/Navbar';
 import { AppContent } from '@/context/AppContext';
 import Link from 'next/link';
 import React, { useState, useEffect, useContext } from 'react';
@@ -126,6 +127,9 @@ const Profile = () => {
   }
 
   return (
+    <div>
+      <Navbar/>
+    
     <div className="min-h-screen bg-blue-50 dark:bg-gray-950 flex flex-col items-center">
 
       {/* Top Banner and Avatar */}
@@ -171,16 +175,17 @@ const Profile = () => {
           </div>
 
           {/* Buttons */}
-          <div className="mt-6 flex flex-col sm:flex-row gap-4">
+          {/* <div className="mt-6 flex flex-col sm:flex-row gap-4">
             <button className="flex-1 py-3 rounded-lg bg-blue-500 text-white font-medium shadow-md hover:bg-blue-600 transition-colors">
               Edit Profile
             </button>
             <button className="flex-1 py-3 rounded-lg bg-red-500 text-white font-medium shadow-md hover:bg-red-600 transition-colors">
               Logout
             </button>
-          </div>
+          </div> */}
         </div>
       </div>
+    </div>
     </div>
   );
 };
