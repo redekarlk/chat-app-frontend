@@ -16,7 +16,7 @@ export default function SocketTestPage() {
   const [joined, setJoined] = useState(false);
 
   useEffect(() => {
-    const s = io("http://localhost:8001");
+    const s = io(process.env.NEXT_PUBLIC_BACKEND_URL);
     setSocket(s);
 
     return () => {
@@ -34,8 +34,8 @@ export default function SocketTestPage() {
     // 2. Fetch previous messages from backend
     try {
       const { data } = await axios.get(
-        `http://localhost:8001/api/messages/${conversationId}`
-        // `http://localhost:8001/api/messages/68b9cc1d4284760f90beb5fe`
+        `/api/messages/${conversationId}`
+        // `/api/messages/68b9cc1d4284760f90beb5fe`
       );
 
       console.log(data)

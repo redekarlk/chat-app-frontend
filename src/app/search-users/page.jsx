@@ -104,7 +104,7 @@ export default function SearchUsers() {
       setLoading(true);
       try {
         const res = await axios.get(
-          `http://localhost:8001/api/user-auth/search?query=${query}`
+          `/api/user-auth/search?query=${query}`
         );
 
         console.log("searching : ", res.data);

@@ -298,7 +298,7 @@ const ProfilePage = () => {
 
     const fetchUser = async () => {
       try {
-        const res = await axios.get(`http://localhost:8001/api/user-auth/${id}`);
+        const res = await axios.get(`/api/user-auth/${id}`);
         const user = res.data.user;
         setProfileUser(user);
 
@@ -327,7 +327,7 @@ const ProfilePage = () => {
   // Send follow request or follow back
   const handleFollow = async () => {
     try {
-      await axios.post(`http://localhost:8001/api/user-auth/${id}/follow-request`, {
+      await axios.post(`/api/user-auth/${id}/follow-request`, {
         receiverId: id,
       });
 

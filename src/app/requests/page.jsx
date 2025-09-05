@@ -116,7 +116,7 @@ const RequestPage = () => {
       setLoading(true);
       try {
         const res = await axios.get(
-          `http://localhost:8001/api/user-auth/${userData._id}/requests`
+          `/api/user-auth/${userData._id}/requests`
         );
         setRequests(res.data.requests || []);
       } catch (err) {
@@ -136,7 +136,7 @@ const RequestPage = () => {
   const handleAccept = async (requesterId) => {
     try {
       await axios.post(
-        `http://localhost:8001/api/user-auth/${requesterId}/accept-request`
+        `/api/user-auth/${requesterId}/accept-request`
         // { requesterId }
       );
       setRequests((prev) => prev.filter((req) => req._id !== requesterId));
@@ -149,7 +149,7 @@ const RequestPage = () => {
   const handleReject = async (requesterId) => {
     try {
       await axios.post(
-        `http://localhost:8001/api/user-auth/${requesterId}/reject-request`
+        `/api/user-auth/${requesterId}/reject-request`
         // { requesterId }
       );
       setRequests((prev) => prev.filter((req) => req._id !== requesterId));

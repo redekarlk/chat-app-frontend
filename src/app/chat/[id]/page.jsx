@@ -159,7 +159,7 @@ const ChatPage = () => {
 
   // Connect socket
   useEffect(() => {
-    const s = io("http://localhost:8001");  
+    const s = io(process.env.NEXT_PUBLIC_BACKEND_URL);  
     setSocket(s);
 
     return () => {
@@ -174,7 +174,7 @@ const ChatPage = () => {
     const createOrGetConversation = async () => {
       try {
         const { data } = await axios.post(
-          "http://localhost:8001/api/conversations",
+          "/api/conversations",
           { senderId, receiverId }
         );
 
@@ -202,7 +202,7 @@ const ChatPage = () => {
     const fetchMessages = async () => {
       try {
         const { data } = await axios.get(
-          `http://localhost:8001/api/messages/${conversationId}`
+          `/api/messages/${conversationId}`
         );
         if (data.success) {
           setMessages(data.messages);
