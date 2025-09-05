@@ -1,3 +1,5 @@
+
+
 // "use client";
 
 // import { useEffect, useState, useContext } from "react";
@@ -6,34 +8,37 @@
 // import { AppContent } from "@/context/AppContext";
 
 // const ProfilePage = () => {
-//   const { id } = useParams(); // The profile user ID from URL
-//   const { userData } = useContext(AppContent); // logged in user
+//   const { id } = useParams(); // Profile user ID from URL
+//   const { userData } = useContext(AppContent); // Logged-in user
 //   const router = useRouter();
 
 //   const [profileUser, setProfileUser] = useState(null);
 //   const [isFollowing, setIsFollowing] = useState(false);
+//   const [isFollower, setIsFollower] = useState(false);
 //   const [hasRequested, setHasRequested] = useState(false);
 
-//   console.log(userData?._id)
-
+//   // Fetch profile user info
 //   useEffect(() => {
-//     if (!id) return;
+//     if (!id || !userData?._id) return;
 
 //     const fetchUser = async () => {
 //       try {
-//         const res = await axios.get(`http://localhost:8001/api/user-auth/${id}`);
+//         const res = await axios.get(`/api/user-auth/${id}`);
 //         const user = res.data.user;
 //         setProfileUser(user);
 
-//         console.log("this is respomse", res.data);
-
-//         // check if logged-in user is already following
-//         if (user.followers?.includes(userData?._id)) {
+//         // ✅ Am I following them?
+//         if (user.followers?.includes(userData._id)) {
 //           setIsFollowing(true);
 //         }
 
-//         // check if logged-in user has already sent a follow request
-//         if (user.followRequests?.includes(userData?._id)) {
+//         // ✅ Are they following me?
+//         if (user.following?.includes(userData._id)) {
+//           setIsFollower(true);
+//         }
+
+//         // ✅ Did I send a follow request?
+//         if (user.followRequests?.includes(userData._id)) {
 //           setHasRequested(true);
 //         }
 //       } catch (err) {
@@ -44,26 +49,27 @@
 //     fetchUser();
 //   }, [id, userData]);
 
+//   // Send follow request or follow back
 //   const handleFollow = async () => {
 //     try {
-//       await axios.post(`http://localhost:8001/api/user-auth/${id}/follow-request`, {
-//         // senderId: userData._id,
+//       await axios.post(`/api/user-auth/${id}/follow-request`, {
 //         receiverId: id,
 //       });
 
-//       setHasRequested(true); // mark request as sent
+//       // ✅ If it’s a follow back, mark as following
+//       if (isFollower && !isFollowing) {
+//         setIsFollowing(true);
+//       } else {
+//         setHasRequested(true);
+//       }
 //     } catch (err) {
 //       console.error("❌ Error sending follow request:", err.response?.data || err.message);
 //     }
 //   };
 
-//   const goToChat = async () => {
-//     try {
-//       // Navigate user to chat page with this profile
-//       router.push(`/chat/${id}`);
-//     } catch (err) {
-//       console.error("❌ Error navigating to chat:", err);
-//     }
+//   // Navigate to chat
+//   const goToChat = () => {
+//     router.push(`/chat/${id}`);
 //   };
 
 //   if (!profileUser) return <p className="p-6">Loading profile...</p>;
@@ -80,26 +86,20 @@
 //         <div>
 //           <h1 className="text-2xl font-bold">{profileUser.name}</h1>
 //           <p className="text-gray-600">{profileUser.email}</p>
+
+//           {/* Followers & Following Count */}
+//           <div className="flex gap-6 mt-2 text-sm text-gray-700">
+//             <span>{profileUser.followers?.length || 0} Followers</span>
+//             <span>{profileUser.following?.length || 0} Following</span>
+//           </div>
 //         </div>
 //       </div>
 
-//       {/* Followers */}
-//       <div className="mb-6">
-//         <h2 className="text-lg font-semibold mb-2">Followers</h2>
-//         {profileUser.followers?.length > 0 ? (
-//           <ul className="list-disc pl-6">
-//             {profileUser.followers.map((followerId) => (
-//               <li key={followerId}>{followerId}</li>
-//             ))}
-//           </ul>
-//         ) : (
-//           <p className="text-gray-500">No followers yet</p>
-//         )}
-//       </div>
 
-//       {/* Follow/Message Button */}
-//       <div>
-//         {isFollowing ? (
+//       {/* Follow/Message Buttons */}
+//       <div className="mt-4">
+//         {isFollowing || isFollower ? (
+//           // ✅ Either I follow them OR they follow me → Message
 //           <button
 //             onClick={goToChat}
 //             className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
@@ -107,10 +107,12 @@
 //             Message
 //           </button>
 //         ) : hasRequested ? (
+//           // ✅ Request already sent
 //           <button className="bg-gray-400 text-white px-4 py-2 rounded-lg cursor-not-allowed">
 //             Request Sent
 //           </button>
 //         ) : (
+//           // ✅ Default → Follow
 //           <button
 //             onClick={handleFollow}
 //             className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
@@ -119,159 +121,13 @@
 //           </button>
 //         )}
 //       </div>
+
 //     </div>
 //   );
 // };
 
 // export default ProfilePage;
 
-
-
-// "use client";
-
-// import { useEffect, useState, useContext } from "react";
-// import { useParams, useRouter } from "next/navigation";
-// import axios from "axios";
-// import { AppContent } from "@/context/AppContext";
-
-// const ProfilePage = () => {
-//     const { id } = useParams(); // The profile user ID from URL
-//     const { userData } = useContext(AppContent); // logged in user
-//     const router = useRouter();
-
-//     const [profileUser, setProfileUser] = useState(null);
-//     const [isFollowing, setIsFollowing] = useState(false);
-//     const [hasRequested, setHasRequested] = useState(false);
-
-//     useEffect(() => {
-//         if (!id || !userData?._id) return;
-
-//         const fetchUser = async () => {
-//             try {
-//                 const res = await axios.get(`http://localhost:8001/api/user-auth/${id}`);
-//                 const user = res.data.user;
-//                 setProfileUser(user);
-
-//                 // ✅ check if logged-in user is following OR being followed
-//                 if (
-//                     user.followers?.includes(userData._id) ||
-//                     user.following?.includes(userData._id)
-//                 ) {
-//                     setIsFollowing(true);
-//                 }
-
-//                 // check if logged-in user already sent request
-//                 if (user.followRequests?.includes(userData._id)) {
-//                     setHasRequested(true);
-//                 }
-//             } catch (err) {
-//                 console.error("❌ Error fetching user:", err.response?.data || err.message);
-//             }
-//         };
-
-//         fetchUser();
-//     }, [id, userData]);
-
-//     const handleFollow = async () => {
-//         try {
-//             await axios.post(`http://localhost:8001/api/user-auth/${id}/follow-request`, {
-//                 receiverId: id,
-//             });
-//             setHasRequested(true); // mark request as sent
-//         } catch (err) {
-//             console.error("❌ Error sending follow request:", err.response?.data || err.message);
-//         }
-//     };
-
-//     const goToChat = () => {
-//         router.push(`/chat/${id}`);
-//     };
-
-//     if (!profileUser) return <p className="p-6">Loading profile...</p>;
-
-//     return (
-//         <div className="p-6 max-w-xl mx-auto">
-//             {/* User Info */}
-//             <div className="flex items-center gap-4 mb-6">
-//                 <img
-//                     src={profileUser.avatar || "https://i.ibb.co/2kR5zq0/default-avatar.png"}
-//                     alt={profileUser.name}
-//                     className="w-20 h-20 rounded-full border"
-//                 />
-//                 <div>
-//                     <h1 className="text-2xl font-bold">{profileUser.name}</h1>
-//                     <p className="text-gray-600">{profileUser.email}</p>
-
-//                     {/* ✅ Followers & Following Count */}
-//                     <div className="flex gap-6 mt-2 text-sm text-gray-700">
-//                         <span>{profileUser.followers?.length || 0} Followers</span>
-//                         <span>{profileUser.following?.length || 0} Following</span>
-//                     </div>
-//                 </div>
-//             </div>
-
-//             {/* Follow/Message Button */}
-//             {/* <div className="mt-4">
-//                 {isFollowing ? (
-//                     <button
-//                         onClick={goToChat}
-//                         className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-//                     >
-//                         Message
-//                     </button>
-//                 ) : hasRequested ? (
-//                     <button className="bg-gray-400 text-white px-4 py-2 rounded-lg cursor-not-allowed">
-//                         Request Sent
-//                     </button>
-//                 ) : (
-//                     <button
-//                         onClick={handleFollow}
-//                         className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
-//                     >
-//                         Follow
-//                     </button>
-//                 )}
-//             </div> */}
-
-//             {/* Follow/Message Button */}
-// <div className="mt-4">
-//   {isFollowing ? (
-//     // ✅ If I already follow them → Message
-//     <button
-//       onClick={goToChat}
-//       className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-//     >
-//       Message
-//     </button>
-//   ) : hasRequested ? (
-//     // ✅ If request already sent → disable
-//     <button className="bg-gray-400 text-white px-4 py-2 rounded-lg cursor-not-allowed">
-//       Request Sent
-//     </button>
-//   ) : isFollower ? (
-//     // ✅ If they follow me but I don’t follow them → Follow Back
-//     <button
-//       onClick={handleFollow}
-//       className="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700"
-//     >
-//       Follow Back
-//     </button>
-//   ) : (
-//     // ✅ Default case → Follow
-//     <button
-//       onClick={handleFollow}
-//       className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
-//     >
-//       Follow
-//     </button>
-//   )}
-// </div>
-
-//         </div>
-//     );
-// };
-
-// export default ProfilePage;
 
 
 
@@ -281,20 +137,30 @@ import { useEffect, useState, useContext } from "react";
 import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 import { AppContent } from "@/context/AppContext";
+import {
+  FaChevronLeft,
+  FaUserPlus,
+  FaMessage,
+  FaUserClock,
+} from "react-icons/fa6";
 
 const ProfilePage = () => {
-  const { id } = useParams(); // Profile user ID from URL
-  const { userData } = useContext(AppContent); // Logged-in user
+  const { id } = useParams();
+  const { userData } = useContext(AppContent);
   const router = useRouter();
 
   const [profileUser, setProfileUser] = useState(null);
   const [isFollowing, setIsFollowing] = useState(false);
   const [isFollower, setIsFollower] = useState(false);
   const [hasRequested, setHasRequested] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  // Fetch profile user info
+  // Fetch profile user info and set relationship states
   useEffect(() => {
-    if (!id || !userData?._id) return;
+    if (!id || !userData?._id) {
+      setLoading(false);
+      return;
+    }
 
     const fetchUser = async () => {
       try {
@@ -302,36 +168,27 @@ const ProfilePage = () => {
         const user = res.data.user;
         setProfileUser(user);
 
-        // ✅ Am I following them?
-        if (user.followers?.includes(userData._id)) {
-          setIsFollowing(true);
-        }
-
-        // ✅ Are they following me?
-        if (user.following?.includes(userData._id)) {
-          setIsFollower(true);
-        }
-
-        // ✅ Did I send a follow request?
-        if (user.followRequests?.includes(userData._id)) {
-          setHasRequested(true);
-        }
+        // Check relationship status
+        setIsFollowing(user.followers?.includes(userData._id));
+        setIsFollower(user.following?.includes(userData._id));
+        setHasRequested(user.followRequests?.includes(userData._id));
       } catch (err) {
         console.error("❌ Error fetching user:", err.response?.data || err.message);
+      } finally {
+        setLoading(false);
       }
     };
-
     fetchUser();
   }, [id, userData]);
 
-  // Send follow request or follow back
+  // Handle follow/follow back request
   const handleFollow = async () => {
     try {
       await axios.post(`/api/user-auth/${id}/follow-request`, {
         receiverId: id,
       });
 
-      // ✅ If it’s a follow back, mark as following
+      // Update state based on the relationship status
       if (isFollower && !isFollowing) {
         setIsFollowing(true);
       } else {
@@ -342,94 +199,86 @@ const ProfilePage = () => {
     }
   };
 
-  // Navigate to chat
+  // Navigate to the chat page
   const goToChat = () => {
     router.push(`/chat/${id}`);
   };
 
-  if (!profileUser) return <p className="p-6">Loading profile...</p>;
+  // Render different states based on loading and data availability
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-50 dark:bg-gray-900 text-gray-700 dark:text-gray-300">
+        <p className="text-lg animate-pulse">Loading profile...</p>
+      </div>
+    );
+  }
+
+  if (!profileUser) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen p-6 text-center bg-gray-50 dark:bg-gray-900 text-gray-700 dark:text-gray-300">
+        <p className="text-xl font-semibold mb-2">Profile Not Found</p>
+        <p className="text-sm text-gray-500">The user profile could not be loaded. Please check the ID and try again.</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="p-6 max-w-xl mx-auto">
-      {/* User Info */}
-      <div className="flex items-center gap-4 mb-6">
-        <img
-          src={profileUser.avatar || "https://i.ibb.co/2kR5zq0/default-avatar.png"}
-          alt={profileUser.name}
-          className="w-20 h-20 rounded-full border"
-        />
-        <div>
-          <h1 className="text-2xl font-bold">{profileUser.name}</h1>
-          <p className="text-gray-600">{profileUser.email}</p>
-
-          {/* Followers & Following Count */}
-          <div className="flex gap-6 mt-2 text-sm text-gray-700">
-            <span>{profileUser.followers?.length || 0} Followers</span>
-            <span>{profileUser.following?.length || 0} Following</span>
-          </div>
-        </div>
+    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-50">
+      {/* Header */}
+      <div className="bg-white dark:bg-gray-800 shadow-sm p-4 flex items-center gap-3 sticky top-0 z-10">
+        <button onClick={() => router.back()} className="text-gray-600 dark:text-gray-300 hover:text-blue-500 p-2 rounded-full">
+          <FaChevronLeft size={24} />
+        </button>
+        <h1 className="text-xl font-semibold">{profileUser.name}</h1>
       </div>
 
-      {/* Follow/Message Buttons */}
-      {/* <div className="mt-4">
-        {isFollowing ? (
-          // ✅ Already following → Message
-          <button
-            onClick={goToChat}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-          >
-            Message
-          </button>
-        ) : hasRequested ? (
-          // ✅ Request already sent
-          <button className="bg-gray-400 text-white px-4 py-2 rounded-lg cursor-not-allowed">
-            Request Sent
-          </button>
-        ) : isFollower ? (
-          // ✅ They follow me, but I don’t follow them → Follow Back
-          <button
-            onClick={handleFollow}
-            className="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700"
-          >
-            Follow Back
-          </button>
-        ) : (
-          // ✅ Default → Follow
-          <button
-            onClick={handleFollow}
-            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
-          >
-            Follow
-          </button>
-        )}
-      </div> */}
+      {/* Main Content */}
+      <div className="flex-1 p-6 flex flex-col items-center">
+        {/* User Info Card */}
+        <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-lg p-8 w-full max-w-sm text-center transform transition-transform duration-300 hover:scale-105">
+          <img
+            src={profileUser.avatar || "https://placehold.co/128x128/60a5fa/ffffff?text=U"}
+            alt={profileUser.name}
+            className="w-28 h-28 rounded-full border-4 border-blue-400 dark:border-blue-600 mx-auto mb-4 object-cover"
+          />
+          <h2 className="text-2xl font-bold mb-1">{profileUser.name}</h2>
+          <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">@{profileUser.username || "user"}</p>
 
-      {/* Follow/Message Buttons */}
-<div className="mt-4">
-  {isFollowing || isFollower ? (
-    // ✅ Either I follow them OR they follow me → Message
-    <button
-      onClick={goToChat}
-      className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-    >
-      Message
-    </button>
-  ) : hasRequested ? (
-    // ✅ Request already sent
-    <button className="bg-gray-400 text-white px-4 py-2 rounded-lg cursor-not-allowed">
-      Request Sent
-    </button>
-  ) : (
-    // ✅ Default → Follow
-    <button
-      onClick={handleFollow}
-      className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
-    >
-      Follow
-    </button>
-  )}
-</div>
+          <div className="flex justify-center gap-6 text-sm text-gray-700 dark:text-gray-300">
+            <div className="flex flex-col items-center">
+              <span className="font-semibold text-lg">{profileUser.followers?.length || 0}</span>
+              <span className="text-xs text-gray-500 dark:text-gray-400">Followers</span>
+            </div>
+            <div className="flex flex-col items-center">
+              <span className="font-semibold text-lg">{profileUser.following?.length || 0}</span>
+              <span className="text-xs text-gray-500 dark:text-gray-400">Following</span>
+            </div>
+          </div>
+        </div>
 
+        {/* Buttons */}
+        <div className="mt-6 w-full max-w-sm">
+          {isFollowing || isFollower ? (
+            <button
+              onClick={goToChat}
+              className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white font-medium py-3 rounded-xl shadow-md hover:bg-blue-700 transition-colors"
+            >
+              <FaMessage /> Message
+            </button>
+          ) : hasRequested ? (
+            <button className="w-full flex items-center justify-center gap-2 bg-gray-400 text-white font-medium py-3 rounded-xl shadow-md cursor-not-allowed">
+              <FaUserClock /> Request Sent
+            </button>
+          ) : (
+            <button
+              onClick={handleFollow}
+              className="w-full flex items-center justify-center gap-2 bg-green-600 text-white font-medium py-3 rounded-xl shadow-md hover:bg-green-700 transition-colors"
+            >
+              <FaUserPlus /> Follow
+            </button>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
