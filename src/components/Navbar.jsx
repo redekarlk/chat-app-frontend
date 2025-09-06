@@ -1,84 +1,3 @@
-// 'use client';
-
-// import { useContext, useState } from 'react';
-// import Link from 'next/link';
-// import { HiMenu, HiX } from 'react-icons/hi';
-// import { AppContent } from '@/context/AppContext';
-
-// export default function Navbar() {
-//     const {userData}= useContext(AppContent);
-//   const [isOpen, setIsOpen] = useState(false);
-
-//   const toggleMenu = () => setIsOpen(!isOpen);
-
-//   const navLinks = [
-//     { name: 'Home', href: '/' },
-//     { name: 'Search', href: '/search-users' },
-//     { name: 'Profile', href: '/profile' },
-//     { name: 'Requests', href: '/requests' },
-//   ];
-
-//   return (
-//     <nav className="bg-gray-900 text-white shadow-md fixed w-full z-50">
-//       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-//         <div className="flex justify-between h-16 items-center">
-//           {/* Logo / Brand */}
-//           <div className="flex-shrink-0">
-//             <Link href="/" className="text-2xl font-bold text-blue-400">
-//               Chat-App
-//             </Link>
-//           </div>
-
-//           {/* Desktop Links */}
-//           <div className="hidden md:flex space-x-6">
-//             {navLinks.map((link) => (
-//               <Link
-//                 key={link.name}
-//                 href={link.href}
-//                 className="hover:text-blue-400 transition-colors font-medium"
-//               >
-//                 {link.name}
-//               </Link>
-//             ))}
-//           </div>
-
-//           {/* Mobile Menu Button */}
-//           <div className="md:hidden flex items-center">
-//             <button onClick={toggleMenu} className="focus:outline-none">
-//               {isOpen ? (
-//                 <HiX className="h-6 w-6" />
-//               ) : (
-//                 <HiMenu className="h-6 w-6" />
-//               )}
-//             </button>
-//           </div>
-//         </div>
-//       </div>
-
-//       {/* Mobile Menu */}
-//       {isOpen && (
-//         <div className="md:hidden bg-gray-800 border-t border-gray-700 transition-all duration-300">
-//           <ul className="flex flex-col px-4 py-4 space-y-2">
-//             {navLinks.map((link) => (
-//               <li key={link.name}>
-//                 <Link
-//                   href={link.href}
-//                   className="block px-3 py-2 rounded-md text-white hover:bg-blue-500 transition-colors font-medium"
-//                   onClick={() => setIsOpen(false)}
-//                 >
-//                   {link.name}
-//                 </Link>
-//               </li>
-//             ))}
-//           </ul>
-//         </div>
-//       )}
-//     </nav>
-//   );
-// }
-
-
-
 'use client';
 
 import { useContext, useState } from 'react';
@@ -87,6 +6,7 @@ import { HiMenu, HiX } from 'react-icons/hi';
 import { AppContent } from '@/context/AppContext';
 import { useRouter } from 'next/navigation'; // for redirect
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 export default function Navbar() {
   const { userData } = useContext(AppContent);
@@ -102,21 +22,31 @@ export default function Navbar() {
     { name: 'Requests', href: '/requests' },
   ];
 
-  const handleLogout = () => {
-   
-    try {
-        const {data} = axios.post(`/api/user-auth/logout`)
+ 
 
-    } catch (error) {
-        console.log(error)
+  const handleLogout = async () => {
+  try {
+    const { data } = await axios.post(`/api/user-auth/logout`);
+
+    console.log(data)
+
+    if (data.success) {
+      toast.success("Logout successfully!");
+    } else {
+      toast.error("Logout failed!");
     }
-    
-    // Close mobile menu
-    setIsOpen(false);
 
-    // Redirect to login
+    // Redirect only after logout success
     router.push('/auth');
-  };
+  } catch (error) {
+    console.error(error);
+    toast.error("Something went wrong during logout!");
+  }
+
+  // Close mobile menu
+  setIsOpen(false);
+};
+
 
   return (
     <nav className="bg-gray-900 text-white shadow-md fixed w-full z-50">
@@ -125,7 +55,7 @@ export default function Navbar() {
           {/* Logo / Brand */}
           <div className="flex-shrink-0">
             <Link href="/" className="text-2xl font-bold text-blue-400">
-              Chat-App
+              Voxtro Chat
             </Link>
           </div>
 
