@@ -34,7 +34,7 @@ const AuthPage = () => {
       const payload =
         state === "Sign Up" ? { name, email, password } : { email, password };
 
-      const { data } = await axios.post(`${backendUrl}${endpoint}`, payload);
+      const { data } = await axios.post(`${backendUrl}${endpoint}`, payload, { withCredentials: true });
 
       // console.log("auth data : ", data)
 
