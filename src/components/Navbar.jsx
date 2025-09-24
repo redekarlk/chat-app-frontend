@@ -19,6 +19,7 @@ export default function Navbar() {
     { name: 'Home', href: '/' },
     { name: 'Search', href: '/search-users' },
     { name: 'Profile', href: '/profile' },
+    { name: 'Messages', href: '/message' },
     { name: 'Requests', href: '/requests' },
   ];
 

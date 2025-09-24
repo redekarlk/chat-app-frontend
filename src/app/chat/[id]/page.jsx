@@ -65,7 +65,7 @@ const ChatPage = () => {
         const res = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user-auth/${receiverId}`);
         setReceiverUserData(res.data.user);
       } catch (err) {
-        console.error("❌ Error fetching user:", err.response?.data || err.message);
+        console.error("Error fetching user:", err.response?.data || err.message);
       }
     };
     fetchUser();
