@@ -17,7 +17,7 @@ const RequestPage = () => {
         const res = await axios.get(`/api/user-auth/${userData._id}/requests`);
         setRequests(res.data.requests || []);
       } catch (err) {
-        console.error("❌ Error fetching requests:", err.response?.data || err.message);
+        console.error("Error fetching requests:", err.response?.data || err.message);
       } finally {
         setLoading(false);
       }
@@ -31,7 +31,7 @@ const RequestPage = () => {
       await axios.post(`/api/user-auth/${requesterId}/accept-request`);
       setRequests((prev) => prev.filter((req) => req._id !== requesterId));
     } catch (err) {
-      console.error("❌ Error accepting request:", err.response?.data || err.message);
+      console.error("Error accepting request:", err.response?.data || err.message);
     }
   };
 
@@ -40,7 +40,7 @@ const RequestPage = () => {
       await axios.post(`/api/user-auth/${requesterId}/reject-request`);
       setRequests((prev) => prev.filter((req) => req._id !== requesterId));
     } catch (err) {
-      console.error("❌ Error rejecting request:", err.response?.data || err.message);
+      console.error("Error rejecting request:", err.response?.data || err.message);
     }
   };
 
@@ -58,7 +58,7 @@ const RequestPage = () => {
   return (
     <div>
       <Navbar />
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-black to-blue-900 py-12 px-4 flex justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-indigo-950 py-12 px-4 flex justify-center">
         <div className="max-w-2xl w-full  mt-10 rounded-3xl   p-6 sm:p-8">
 
           {/* Header */}
@@ -72,7 +72,7 @@ const RequestPage = () => {
           {/* Requests List */}
           {requests?.length === 0 ? (
             <p className="text-gray-400 text-center py-10 text-lg italic">
-              You’re all caught up! No requests pending.
+             No requests pending.
             </p>
           ) : (
             <ul className="space-y-6">

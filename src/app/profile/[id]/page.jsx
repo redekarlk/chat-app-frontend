@@ -4,12 +4,7 @@ import { useEffect, useState, useContext } from "react";
 import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 import { AppContent } from "@/context/AppContext";
-import {
-  FaChevronLeft,
-  FaUserPlus,
-  FaMessage,
-  FaUserClock,
-} from "react-icons/fa6";
+import { FaChevronLeft, FaUserPlus, FaMessage, FaUserClock } from "react-icons/fa6";
 
 const ProfilePage = () => {
   const { id } = useParams();
@@ -38,27 +33,32 @@ const ProfilePage = () => {
         setIsFollower(user.following?.includes(userData._id));
         setHasRequested(user.followRequests?.includes(userData._id));
       } catch (err) {
-        console.error("❌ Error fetching user:", err.response?.data || err.message);
+        console.error("Error fetching user:", err.response?.data || err.message);
       } finally {
         setLoading(false);
       }
     };
+
     fetchUser();
   }, [id, userData]);
 
   const handleFollow = async () => {
+    // Immediate UI feedback
+    setHasRequested(true);
+
     try {
       await axios.post(`/api/user-auth/${id}/follow-request`, {
         receiverId: id,
       });
 
+      // If this was a follower back scenario
       if (isFollower && !isFollowing) {
         setIsFollowing(true);
-      } else {
-        setHasRequested(true);
       }
     } catch (err) {
-      console.error("❌ Error sending follow request:", err.response?.data || err.message);
+      console.error("Error sending follow request:", err.response?.data || err.message);
+      // Reset request if API fails
+      setHasRequested(false);
     }
   };
 
@@ -86,8 +86,6 @@ const ProfilePage = () => {
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-gray-900 to-black text-white">
       {/* Header */}
-
-
       <div className="bg-gradient-to-r from-indigo-900 via-purple-900 to-black p-4 flex items-center gap-3 sticky top-0 z-10 shadow-md">
         <button
           onClick={() => router.back()}
@@ -98,16 +96,12 @@ const ProfilePage = () => {
         <h1 className="text-lg font-semibold">{profileUser.name}</h1>
       </div>
 
-
       {/* Main */}
       <div className="flex-1 p-6 flex flex-col items-center">
         {/* Card */}
         <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 w-full max-w-sm text-center border border-white/20 shadow-xl">
           <img
-            src={
-              profileUser.avatar ||
-              "https://placehold.co/128x128/60a5fa/ffffff?text=U"
-            }
+            src={profileUser.avatar || "https://placehold.co/128x128/60a5fa/ffffff?text=U"}
             alt={profileUser.name}
             className="w-24 h-24 rounded-full border-4 border-indigo-500 mx-auto mb-4 object-cover"
           />
@@ -117,34 +111,52 @@ const ProfilePage = () => {
           {/* Followers */}
           <div className="flex justify-center gap-10 mt-4 text-sm">
             <div className="flex flex-col items-center">
-              <span className="font-bold text-lg">
-                {profileUser.followers?.length || 0}
-              </span>
+              <span className="font-bold text-lg">{profileUser.followers?.length || 0}</span>
               <span className="text-xs text-gray-400">Followers</span>
             </div>
             <div className="flex flex-col items-center">
-              <span className="font-bold text-lg">
-                {profileUser.following?.length || 0}
-              </span>
+              <span className="font-bold text-lg">{profileUser.following?.length || 0}</span>
               <span className="text-xs text-gray-400">Following</span>
             </div>
           </div>
         </div>
 
+
         {/* Buttons */}
-        <div className="mt-6 w-full max-w-sm">
-          {isFollowing || isFollower ? (
-            <button
-              onClick={goToChat}
-              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold py-3 rounded-xl shadow-md hover:opacity-90 transition"
-            >
-              <FaMessage /> Message
-            </button>
-          ) : hasRequested ? (
-            <button className="w-full flex items-center justify-center gap-2 bg-gray-500/60 text-white font-semibold py-3 rounded-xl shadow-md cursor-not-allowed">
+        <div className="mt-6 w-full max-w-sm space-y-3">
+          {/* Request Sent */}
+          {hasRequested && (
+            <div className="w-full flex items-center justify-center gap-2 bg-gray-500/60 text-white font-semibold py-3 rounded-xl shadow-md cursor-not-allowed">
               <FaUserClock /> Request Sent
+            </div>
+          )}
+
+          {/* Following */}
+          {isFollowing && (
+            <div className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white font-semibold py-3 rounded-xl shadow-md cursor-not-allowed">
+              Following
+            </div>
+          )}
+
+          {/* Follow Back */}
+          {isFollower && !isFollowing && !hasRequested && (
+            <button
+              onClick={handleFollow} // Follow back
+              className="w-full flex items-center justify-center gap-2 bg-purple-600 text-white font-semibold py-3 rounded-xl shadow-md hover:opacity-90 transition"
+            >
+              Follow Back
             </button>
-          ) : (
+          )}
+
+          {/* Followed */}
+          {isFollower && isFollowing && !hasRequested && (
+            <div className="w-full flex items-center justify-center gap-2 bg-purple-600 text-white font-semibold py-3 rounded-xl shadow-md cursor-not-allowed">
+              Followed
+            </div>
+          )}
+
+          {/* Follow */}
+          {!isFollower && !isFollowing && !hasRequested && (
             <button
               onClick={handleFollow}
               className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-green-400 to-emerald-600 text-white font-semibold py-3 rounded-xl shadow-md hover:opacity-90 transition"
@@ -152,7 +164,20 @@ const ProfilePage = () => {
               <FaUserPlus /> Follow
             </button>
           )}
+
+          {/* Message Button */}
+          {(isFollowing || isFollower) && (
+            <button
+              onClick={goToChat}
+              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold py-3 rounded-xl shadow-md hover:opacity-90 transition"
+            >
+              <FaMessage /> Message
+            </button>
+          )}
         </div>
+
+
+
       </div>
     </div>
   );
